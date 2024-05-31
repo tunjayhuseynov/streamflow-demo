@@ -76,7 +76,7 @@ export default function useClientCreateStreamHook() {
                     transferableByRecipient: false,
                 }, isNative)
 
-                toast.success(`${res?.txId} is successfully created!`)
+                toast.success(`TX ${res?.txId} is successfully created!`)
             } else {
                 const recipients = data.recipients.map((rec) => {
                     const amountPerPeriod = BigNumber(rec.amount).dividedBy(BigNumber(deadline).dividedBy(period)).toNumber()
@@ -103,7 +103,7 @@ export default function useClientCreateStreamHook() {
                     transferableByRecipient: false,
                 }, isNative)
 
-                toast.success(`TX ${res?.txs.join(", ")} are successfully created!`)
+                toast.success(`TXs ${res?.txs.join(", ")} are successfully created!`)
             }
         } catch (error) {
             if (error instanceof Error) {
