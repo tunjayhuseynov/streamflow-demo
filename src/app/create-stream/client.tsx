@@ -46,7 +46,7 @@ export default function CreateStreamClientPage() {
                                         </FormControl>
                                         <SelectContent>
                                             {tokens?.map((token) => {
-                                                return <SelectItem value={JSON.stringify({ address: token.address, decimal: token.decimals })} key={token.address}>
+                                                return <SelectItem value={JSON.stringify(token)} key={token.address}>
                                                     <div className="flex space-x-4">
                                                         <img src={token.logoURI} className="size-5" />
                                                         <div>

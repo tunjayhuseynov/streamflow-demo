@@ -15,25 +15,27 @@ export default function useStream() {
     const [streamStatus, setStreamStatus] = useState<"loading" | "idle" | "error">("idle")
     const [creatingStreamStatus, setCreatingStreamStatus] = useState<"loading" | "idle" | "error">("idle")
 
-    const createStream = useCallback(async (createStreamParams: ICreateStreamData) => {
+    const createStream = useCallback(async (createStreamParams: ICreateStreamData, isNative: boolean = true) => {
         if (wallet) {
             try {
                 setCreatingStreamStatus("loading")
-                let stream = await context.streamflowConnection.create(createStreamParams, { sender: wallet.adapter as any })
+                let stream = await context.streamflowConnection.create(createStreamParams, { sender: wallet.adapter as any, isNative })
                 
                 setCreatingStreamStatus("idle")
                 return stream
             } catch (error) {
+                console.log(error)
                 setCreatingStreamStatus("error")
+                throw error
             }
         }
     }, [pkString])
 
-    const createStreamMultiple = useCallback(async (createStreamParams: ICreateMultipleStreamData) => {
+    const createStreamMultiple = useCallback(async (createStreamParams: ICreateMultipleStreamData, isNative: boolean = true) => {
         if (wallet) {
             try {
                 setCreatingStreamStatus("loading")
-                let stream = await context.streamflowConnection.createMultiple(createStreamParams, { sender: wallet.adapter as any })
+                let stream = await context.streamflowConnection.createMultiple(createStreamParams, { sender: wallet.adapter as any, isNative })
 
                 setCreatingStreamStatus("idle")
                 return stream

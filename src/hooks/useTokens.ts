@@ -5,9 +5,9 @@ import { TOKEN_PROGRAM_ID } from "@solana/spl-token";
 import { FetchTokenList } from "@/lib/tokens";
 import BigNumber from "bignumber.js";
 import { LAMPORTS_PER_SOL } from "@solana/web3.js";
-import { Unknown_Token } from "@/lib/consts";
+import { Unknown_Token, WrappedSolAddress } from "@/lib/consts";
 import useAsyncEffect from "./useAsyncEffect";
-
+import { IToken } from "@/types/token";
 
 
 export default function useTokens() {
@@ -27,7 +27,7 @@ export default function useTokens() {
         }
     }, [connected])
 
-    const getTokens = useCallback(async () => {
+    const getTokens: () => Promise<IToken[]> = useCallback(async () => {
         if (publicKey) {
             try {
                 setTokenListStatus("loading")
@@ -49,7 +49,7 @@ export default function useTokens() {
                     }
                 })
 
-                const solana = tokens.tokens.find((token) => token.address == "So11111111111111111111111111111111111111112")
+                const solana = tokens.tokens.find((token) => token.address == WrappedSolAddress)
 
                 if (solana) {
                     list.unshift({

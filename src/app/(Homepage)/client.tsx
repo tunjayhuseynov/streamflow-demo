@@ -52,47 +52,49 @@ function Connected({ publicKey }: IConnected) {
                 {streamStatus == "error" && "Oops.. Something went wrong"}
                 {streamStatus == "idle" && !streams?.length && "No stream"}
                 {streamStatus == "idle" && !!streams?.length &&
-                    <div>
-                        {
-                            streams.map((val, index) => {
-                                const [id, stream] = val
-                                return <div key={id}>
-                                    ------
-                                    <div className="flex space-x-2">
-                                        <div>
-                                            #{index + 1}
+                    <div className="overflow-hidden">
+                        <div className="h-96  overflow-auto">
+                            {
+                                streams.map((val, index) => {
+                                    const [id, stream] = val
+                                    return <div key={id}>
+                                        ------
+                                        <div className="flex space-x-2">
+                                            <div>
+                                                #{index + 1}
+                                            </div>
+                                            <div>
+                                                <div>
+                                                    Id: {id}
+                                                </div>
+                                                <div>
+                                                    Token: {stream.token?.name ?? "N/A"}
+                                                </div>
+                                                <div>
+                                                    Deposited amount: {stream.token?.decimals ? getNumberFromBN(stream.depositedAmount, stream.token.decimals) : "N/A"}
+                                                </div>
+                                                <div>
+                                                    Amount per period: {stream.token?.decimals ? getNumberFromBN(stream.amountPerPeriod, stream.token.decimals) : "N/A"}
+                                                </div>
+                                                <div>
+                                                    Withdrawn amount: {stream.token?.decimals ? getNumberFromBN(stream.withdrawnAmount, stream.token.decimals) : "N/A"}
+                                                </div>
+                                                <div>
+                                                    Period: {TimePeriods.find(s => s.periodInSecs == stream.period)?.name || "N/A"}
+                                                </div>
+                                                <div>
+                                                    Due to: {new Date(stream.end * 1e3).toLocaleString()}
+                                                </div>
+                                                <div>
+                                                    Recipient: {stream.recipient}
+                                                </div>
+                                            </div>
                                         </div>
-                                        <div>
-                                            <div>
-                                                Id: {id}
-                                            </div>
-                                            <div>
-                                                Token: {stream.token?.name ?? "N/A"}
-                                            </div>
-                                            <div>
-                                                Deposited amount: {stream.token?.decimals ? getNumberFromBN(stream.depositedAmount, stream.token.decimals) : "N/A"}
-                                            </div>
-                                            <div>
-                                                Amount per period: {stream.token?.decimals ? getNumberFromBN(stream.amountPerPeriod, stream.token.decimals) : "N/A"}
-                                            </div>
-                                            <div>
-                                                Withdrawn amount: {stream.token?.decimals ? getNumberFromBN(stream.withdrawnAmount, stream.token.decimals) : "N/A"}
-                                            </div>
-                                            <div>
-                                                Period: {TimePeriods.find(s => s.periodInSecs == stream.period)?.name || "N/A"}
-                                            </div>
-                                            <div>
-                                                Due to: {new Date(stream.end * 1e3).toLocaleString()}
-                                            </div>
-                                            <div>
-                                                Recipient: {stream.recipient}
-                                            </div>
-                                        </div>
+                                        ------
                                     </div>
-                                    ------
-                                </div>
-                            })
-                        }
+                                })
+                            }
+                        </div>
                     </div>
                 }
             </div>

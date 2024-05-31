@@ -1,5 +1,7 @@
 export const SolanaTokenListEndpoint = "https://cdn.jsdelivr.net/gh/solflare-wallet/token-list@master/solana-tokenlist.json"
 
+export const WrappedSolAddress = "So11111111111111111111111111111111111111112"
+
 export const Unknown_Token = {
     symbol: "Unknown",
     address: "",

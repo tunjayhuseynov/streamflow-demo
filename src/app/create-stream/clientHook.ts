@@ -7,6 +7,8 @@ import { z } from "zod"
 import useStream from "@/hooks/useStream"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
+import { WrappedSolAddress } from "@/lib/consts"
+import { IToken } from "@/types/token"
 
 
 const recipientSchema = z.object({
@@ -28,7 +30,7 @@ const formSchema = z.object({
     recipients: z.array(recipientSchema).min(1, "At least 1 recipient is required"),
 })
 
-export default function useClientCreateStreamHook(){
+export default function useClientCreateStreamHook() {
     const { createStream, createStreamMultiple, creatingStreamStatus } = useStream()
 
     const form = useForm<z.infer<typeof formSchema>>({
@@ -42,63 +44,71 @@ export default function useClientCreateStreamHook(){
 
     // Submit function of the `Create Stream` form
     const onSubmit = async (data: z.infer<typeof formSchema>) => {
-        const token = JSON.parse(data.token) as { address: string, decimal: number }
-        const deadline = (+data.durationPeriod) * data.duration
-        const period = +data.unlockSchedule
+        try {
+            const token = JSON.parse(data.token) as IToken
+            const isNative = token.address == "Native" || token.address == WrappedSolAddress
+
+            const deadline = (+data.durationPeriod) * data.duration
+            const period = +data.unlockSchedule
 
 
-        if (data.recipients.length == 1) {
-            const recipient = data.recipients[0]
+            if (data.recipients.length == 1) {
+                const recipient = data.recipients[0]
 
-            const amountPerPeriod = BigNumber(recipient.amount).dividedBy(BigNumber(deadline).dividedBy(period)).toNumber()
+                const amountPerPeriod = BigNumber(recipient.amount).dividedBy(BigNumber(deadline).dividedBy(period)).toNumber()
 
-            const res = await createStream({
-                amount: getBN(recipient.amount, token.decimal),
-                tokenId: token.address,
-                name: "Demo transfer",
-                recipient: recipient.recipient,
-                cliffAmount: new BN(0),
-                cliff: getTimeInSeconds() + 120,
-                start: getTimeInSeconds() + 60,
-                period,
-                amountPerPeriod: getBN(amountPerPeriod, token.decimal),
-
-                automaticWithdrawal: true,
-                canTopup: false,
-                cancelableBySender: true,
-                cancelableByRecipient: false,
-                transferableBySender: true,
-                transferableByRecipient: false,
-            })
-
-            toast.success(`${res?.txId} is successfully created!`)
-        } else {
-            const recipients = data.recipients.map((rec)=>{
-                const amountPerPeriod = BigNumber(rec.amount).dividedBy(BigNumber(deadline).dividedBy(period)).toNumber()
-                return {
-                    recipient: rec.recipient,
-                    amount: getBN(rec.amount, token.decimal),
+                const res = await createStream({
+                    amount: getBN(recipient.amount, token.decimals),
+                    tokenId: token.address,
                     name: "Demo transfer",
+                    recipient: recipient.recipient,
                     cliffAmount: new BN(0),
-                    amountPerPeriod: getBN(amountPerPeriod, token.decimal)
-                }
-            })
+                    cliff: getTimeInSeconds() + 120,
+                    start: getTimeInSeconds() + 60,
+                    period,
+                    amountPerPeriod: getBN(amountPerPeriod, token.decimals),
 
-            const res = await createStreamMultiple({
-                recipients,
-                tokenId: token.address,
-                cliff: getTimeInSeconds() + 120,
-                start: getTimeInSeconds() + 60,
-                period,
-                automaticWithdrawal: true,
-                canTopup: false,
-                cancelableBySender: true,
-                cancelableByRecipient: false,
-                transferableBySender: true,
-                transferableByRecipient: false,
-            })
+                    automaticWithdrawal: true,
+                    canTopup: false,
+                    cancelableBySender: true,
+                    cancelableByRecipient: false,
+                    transferableBySender: true,
+                    transferableByRecipient: false,
+                }, isNative)
 
-            toast.success(`${res?.txs.join(", ")} are successfully created!`)
+                toast.success(`${res?.txId} is successfully created!`)
+            } else {
+                const recipients = data.recipients.map((rec) => {
+                    const amountPerPeriod = BigNumber(rec.amount).dividedBy(BigNumber(deadline).dividedBy(period)).toNumber()
+                    return {
+                        recipient: rec.recipient,
+                        amount: getBN(rec.amount, token.decimals),
+                        name: "Demo transfer",
+                        cliffAmount: new BN(0),
+                        amountPerPeriod: getBN(amountPerPeriod, token.decimals)
+                    }
+                })
+
+                const res = await createStreamMultiple({
+                    recipients,
+                    tokenId: token.address,
+                    cliff: getTimeInSeconds() + 120,
+                    start: getTimeInSeconds() + 60,
+                    period,
+                    automaticWithdrawal: true,
+                    canTopup: false,
+                    cancelableBySender: true,
+                    cancelableByRecipient: false,
+                    transferableBySender: true,
+                    transferableByRecipient: false,
+                }, isNative)
+
+                toast.success(`TX ${res?.txs.join(", ")} are successfully created!`)
+            }
+        } catch (error) {
+            if (error instanceof Error) {
+                toast.error(error.message)
+            }
         }
     }
 

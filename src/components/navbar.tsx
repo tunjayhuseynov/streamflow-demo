@@ -10,9 +10,11 @@ let WalletMultiButton = dynamic(() => import("@solana/wallet-adapter-react-ui").
 export default function Navbar() {
     const { publicKey } = useWallet()
 
-    return <nav className="h-20 w-full container mx-auto absolute left-0 top-0">
+    return <nav className="h-20 w-full absolute left-0 top-0 px-16 ">
         <div className="grid grid-cols-2 h-full">
-            <div></div>
+            <div className="flex items-center">
+                <Link href="/" className="text-xl font-bold">Streamflow Demo</Link>
+            </div>
             <div className="flex items-center justify-end space-x-4">
                 {!!publicKey &&
                     <Link href={"create-stream"}>
